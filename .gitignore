@@ -1,0 +1,12 @@
+*.py[co]
+*.*~
+*.py~
+# Packages
+*.egg
+*.egg-info
+*.*.swp
+/build/
+# Locally genenerated mtz
+/*.mtz
+*.conf
+
