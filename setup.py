@@ -3,16 +3,16 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='VT_Transform',
+    name='OTX_transform',
     author='Sebastien Larinier',
     version='1.0',
     author_email='sebdraven@protonmail.com',
     maintainer='Sebastien Larinier',
     url='',
-    description='Maltego transform for interacting with a Virustotal.',
+    description='Maltego transform for interacting with a otx alienvault.',
     license='GPLv3',
-    packages=find_packages('VT_Transform'),
-    package_dir={'': 'VT_Transform'},
+    packages=find_packages('OTX_transform'),
+    package_dir={'': 'OTX_transform'},
     zip_safe=False,
     classifiers=[
         'License :: OSI Approved :: GNU General Public License v3',
