@@ -6,7 +6,7 @@ import requests
 
 
 class Pulses(Transform):
-
+    namespace = "Otx_Transform"
     description = "Get Pulses linked with otx"
 
     def do_transform(self, request, response, config):
@@ -40,14 +40,16 @@ class Pulses(Transform):
 
 class PulsesDomain(Pulses):
     input_type = Domain
-
+    namespace = "Otx_Transform"
 
 class PulsesIP(Pulses):
     input_type = IPv4Address
+    namespace = "Otx_Transform"
 
 class Tags(Transform):
 
     input_type = Pulse
+    namespace = "Otx_Transform"
 
     def do_transform(self, request, response, config):
         base_url = config['OTX_transform.local.otx_url']
@@ -75,3 +77,29 @@ class Tags(Transform):
                 response += p
 
         return response
+
+
+class Related_Pulses(Transform):
+    input_type = Pulse
+    namespace = "Otx_Transform"
+
+    def do_transform(self, request, response, config):
+        base_url = config['OTX_transform.local.otx_url']
+        api_key = config['OTX_transform.local.api_key']
+
+        id_p = request.entity.ID
+
+        url = '%s/pulses/%s/related' % (base_url, id_p)
+
+        r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
+
+        if r.status_code==200:
+            res = r.json()['results']
+            for pulse in res:
+                p = Pulse()
+                p.URL = 'https://otx.alienvault.com/pulse/%s' % pulse['id']
+                p.ID = pulse['id']
+                p.value = pulse['name']
+                p.link_label = pulse['modified']
+                response += p
+            return response
