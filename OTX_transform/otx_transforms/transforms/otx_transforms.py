@@ -105,6 +105,7 @@ class Related_Pulses(Transform):
 
             return response
 
+
 class Indicators(Transform):
 
     input_type = Pulse
@@ -115,7 +116,7 @@ class Indicators(Transform):
         api_key = config['OTX_transform.local.api_key']
 
         id_p = request.entity.ID
-        id_p = "5cfe6b9d0ecf65e404ef4f85"
+
         url = '%s/pulses/%s/indicators' % (base_url, id_p)
 
         r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
@@ -132,7 +133,33 @@ class Indicators(Transform):
                     ind_maltego = cores[indicator['type']]()
                     ind_maltego.value = indicator['indicator']
                     ind_maltego.link_label = indicator['created']
+                    ind_maltego.url = 'https://otx.alienvault.com/indicator/%s/%s' \
+                                      % (indicator['type'], indicator['indicator'])
                     response += ind_maltego
             else:
                 is_finish = True
+        return response
+
+
+class PDNS(Transform):
+    input_type = Domain
+    namespace = "Otx_Transform"
+
+    def do_transform(self, request, response, config):
+        base_url = config['OTX_transform.local.otx_url']
+        api_key = config['OTX_transform.local.api_key']
+        host = request.entity.value
+        url = '%s/indicators/hostname/%s/passive_dns' %\
+              (base_url, host)
+        r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
+        if r.status_code == 200:
+
+            res = r.json()
+
+            for pdns in res['passive_dns']:
+
+                ip = IPv4Address(pdns['address'])
+                ip.link_label = 'last: %s' % pdns['last']
+                response += ip
+
         return response
