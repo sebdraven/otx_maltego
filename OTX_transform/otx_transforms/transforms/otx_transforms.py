@@ -1,7 +1,7 @@
 from canari.maltego.entities import Domain, IPv4Address, Phrase
 from canari.maltego.transform import Transform
 from OTX_transform.otx_transforms.transforms.common.entities import Pulse
-from OTX_transform.otx_transforms.transforms.common.utils import gram
+from OTX_transform.otx_transforms.transforms.common.utils import gram,cores
 import requests
 
 
@@ -102,4 +102,37 @@ class Related_Pulses(Transform):
                 p.value = pulse['name']
                 p.link_label = pulse['modified']
                 response += p
+
             return response
+
+class Indicators(Transform):
+
+    input_type = Pulse
+    namespace = "Otx_Transform"
+
+    def do_transform(self, request, response, config):
+        base_url = config['OTX_transform.local.otx_url']
+        api_key = config['OTX_transform.local.api_key']
+
+        id_p = request.entity.ID
+        id_p = "5cfe6b9d0ecf65e404ef4f85"
+        url = '%s/pulses/%s/indicators' % (base_url, id_p)
+
+        r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
+        res = r.json()
+        is_finish = False
+
+        while not is_finish:
+            next_url = res['next']
+
+            if next_url:
+                r = requests.get(next_url, headers={'X-OTX-API-KEY': api_key})
+                res = r.json()
+                for indicator in res['results']:
+                    ind_maltego = cores[indicator['type']]()
+                    ind_maltego.value = indicator['indicator']
+                    ind_maltego.link_label = indicator['created']
+                    response += ind_maltego
+            else:
+                is_finish = True
+        return response
