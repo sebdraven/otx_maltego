@@ -1,7 +1,9 @@
-from canari.maltego.entities import Domain, IPv4Address, Phrase
+import logging
+
+from canari.maltego.entities import Domain, IPv4Address, Phrase, Hash
 from canari.maltego.transform import Transform
 from OTX_transform.otx_transforms.transforms.common.entities import Pulse
-from OTX_transform.otx_transforms.transforms.common.utils import gram,cores
+from OTX_transform.otx_transforms.transforms.common.utils import gram,cores,type_hash
 import requests
 
 
@@ -17,11 +19,15 @@ class Pulses(Transform):
         entity_value = request.entity.value
 
         url = '%s/indicators/%s/%s/general' % (base_url, entity_type, entity_value)
-
+        logging.debug(url)
         r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
         if r.status_code == 200:
-
-            res = r.json()
+            try:
+                res = r.json()
+            except:
+                p = Phrase(url)
+                response +=p
+                return response
 
             for pulse in res['pulse_info']['pulses']:
                 p = Pulse()
@@ -45,6 +51,10 @@ class PulsesDomain(Pulses):
 class PulsesIP(Pulses):
     input_type = IPv4Address
     namespace = "Otx_Transform"
+
+class PulsesHashes(Pulses):
+    input_type = Hash
+    namespace = 'Otx_Transform'
 
 class Tags(Transform):
 
@@ -119,23 +129,22 @@ class Indicators(Transform):
 
         url = '%s/pulses/%s/indicators' % (base_url, id_p)
 
-        r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
-        res = r.json()
         is_finish = False
 
         while not is_finish:
-            next_url = res['next']
-
-            if next_url:
-                r = requests.get(next_url, headers={'X-OTX-API-KEY': api_key})
+            if url:
+                r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
                 res = r.json()
                 for indicator in res['results']:
                     ind_maltego = cores[indicator['type']]()
+                    if indicator['type'] in type_hash:
+                        ind_maltego.type = type_hash[indicator['type']]
                     ind_maltego.value = indicator['indicator']
                     ind_maltego.link_label = indicator['created']
                     ind_maltego.url = 'https://otx.alienvault.com/indicator/%s/%s' \
                                       % (indicator['type'], indicator['indicator'])
                     response += ind_maltego
+                url = res['next']
             else:
                 is_finish = True
         return response
