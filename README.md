@@ -7,9 +7,9 @@ Oxt_maltego is a rewritten in python 3 and canari (https://github.com/redcanari/
 
 Import in Maltego the entities file named entities.mtz
 
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
-canari create-profile OTX_transform
+`canari create-profile OTX_transform`
 
 Configure  OTX_transform.conf to set _otx_url=https://otx.alienvault.com/api/v1_
 and _api_key_
