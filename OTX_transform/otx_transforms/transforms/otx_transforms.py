@@ -135,11 +135,19 @@ class Indicators(Transform):
             if url:
                 r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
                 res = r.json()
+
                 for indicator in res['results']:
                     ind_maltego = cores[indicator['type']]()
+
                     if indicator['type'] in type_hash:
                         ind_maltego.type = type_hash[indicator['type']]
-                    ind_maltego.value = indicator['indicator']
+
+                    if indicator['type'] == 'YARA':
+                        content = indicator['content']
+                        ind_maltego.value = content.split('{')[0]
+                    else:
+                        ind_maltego.value = indicator['indicator']
+
                     ind_maltego.link_label = indicator['created']
                     ind_maltego.url = 'https://otx.alienvault.com/indicator/%s/%s' \
                                       % (indicator['type'], indicator['indicator'])

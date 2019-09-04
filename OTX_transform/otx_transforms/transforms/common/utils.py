@@ -1,4 +1,6 @@
-from canari.maltego.entities import IPv4Address, Domain, URL, Hash
+from canari.maltego.entities import IPv4Address, Domain, URL, Hash, Phrase
+
+from OTX_transform.otx_transforms.transforms.common.entities import CVE,Yara
 
 gram = {
 
@@ -16,6 +18,8 @@ cores = {
     'FileHash-MD5': Hash,
     'FileHash-SHA1': Hash,
     'FileHash-SHA256': Hash,
+    'CVE': CVE,
+    'YARA': Yara
 }
 
 type_hash = {
