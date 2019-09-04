@@ -1,9 +1,9 @@
-#Presentation
+# Presentation
 
 Oxt_maltego is a rewritten in python 3 and canari (https://github.com/redcanari/canari3) a framework of transforms Maltego (https://www.paterva.com/)
  
 
-#Installation
+# Installation
 
 Import in Maltego the entities file named entities.mtz
 
@@ -17,7 +17,7 @@ and _api_key_
 Import OTX_transform.mtz in maltego
 
 
-#Custom Entities
+# Custom Entities
 * Pulse: a pulse in entry in Otx Alienvault. 
 * CVE
 * Yara: name of Yara rule (https://yara.readthedocs.io/) in a pulsdr
