@@ -1,10 +1,10 @@
-import logging
-
+import requests
 from canari.maltego.entities import Domain, IPv4Address, Phrase, Hash
 from canari.maltego.transform import Transform
+
 from OTX_transform.otx_transforms.transforms.common.entities import Pulse
-from OTX_transform.otx_transforms.transforms.common.utils import gram,cores,type_hash
-import requests
+from OTX_transform.otx_transforms.transforms.common.utils import gram, cores, \
+    type_hash
 
 
 class Pulses(Transform):
@@ -19,7 +19,7 @@ class Pulses(Transform):
         entity_value = request.entity.value
 
         url = '%s/indicators/%s/%s/general' % (base_url, entity_type, entity_value)
-        logging.debug(url)
+
         r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
         if r.status_code == 200:
             try:
@@ -178,5 +178,28 @@ class PDNS(Transform):
                 ip = IPv4Address(pdns['address'])
                 ip.link_label = 'last: %s' % pdns['last']
                 response += ip
+
+        return response
+
+
+class TagsHashes(Transform):
+
+    input_type = Hash
+    namespace = "Otx_Transform"
+
+    def do_transform(self, request, response, config):
+
+        hash_value = request.entity.value
+
+        h = Hash(value=hash_value)
+
+        if len(h) == 64:
+            h.type = 'SHA256'
+        elif h.type == 40:
+            h.type = 'SHA1'
+        elif h.value == 32:
+            h.type = 'MD5'
+
+        response += h
 
         return response

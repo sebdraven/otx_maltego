@@ -1,12 +1,13 @@
-from canari.maltego.entities import IPv4Address, Domain, URL, Hash, Phrase
+from canari.maltego.entities import IPv4Address, Domain, URL, Hash
 
-from OTX_transform.otx_transforms.transforms.common.entities import CVE,Yara
+from OTX_transform.otx_transforms.transforms.common.entities import CVE, Yara
 
 gram = {
 
-'maltego.Domain':'hostname',
+'maltego.Domain':'domain',
 'maltego.IPv4Address': 'IPv4',
-'SHA256':'file'
+'SHA256':'file',
+'MD5': 'file',
 
 }
 
