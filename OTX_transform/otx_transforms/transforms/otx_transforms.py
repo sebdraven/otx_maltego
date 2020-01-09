@@ -18,7 +18,8 @@ class Pulses(Transform):
         entity_type = gram[request.entity.type]
         entity_value = request.entity.value
 
-        url = '%s/indicators/%s/%s/general' % (base_url, entity_type, entity_value)
+        url = '%s/indicators/%s/%s/general' % (
+        base_url, entity_type, entity_value)
 
         r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
         if r.status_code == 200:
@@ -26,7 +27,7 @@ class Pulses(Transform):
                 res = r.json()
             except:
                 p = Phrase(url)
-                response +=p
+                response += p
                 return response
 
             for pulse in res['pulse_info']['pulses']:
@@ -48,16 +49,18 @@ class PulsesDomain(Pulses):
     input_type = Domain
     namespace = "Otx_Transform"
 
+
 class PulsesIP(Pulses):
     input_type = IPv4Address
     namespace = "Otx_Transform"
+
 
 class PulsesHashes(Pulses):
     input_type = Hash
     namespace = 'Otx_Transform'
 
-class Tags(Transform):
 
+class Tags(Transform):
     input_type = Pulse
     namespace = "Otx_Transform"
 
@@ -74,7 +77,6 @@ class Tags(Transform):
             res = r.json()
 
             for ind in res['industries']:
-
                 p = Phrase(ind)
 
                 response += p
@@ -103,7 +105,7 @@ class Related_Pulses(Transform):
 
         r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
 
-        if r.status_code==200:
+        if r.status_code == 200:
             res = r.json()['results']
             for pulse in res:
                 p = Pulse()
@@ -117,7 +119,6 @@ class Related_Pulses(Transform):
 
 
 class Indicators(Transform):
-
     input_type = Pulse
     namespace = "Otx_Transform"
 
@@ -150,7 +151,8 @@ class Indicators(Transform):
 
                     ind_maltego.link_label = indicator['created']
                     ind_maltego.url = 'https://otx.alienvault.com/indicator/%s/%s' \
-                                      % (indicator['type'], indicator['indicator'])
+                                      % (
+                                      indicator['type'], indicator['indicator'])
                     response += ind_maltego
                 url = res['next']
             else:
@@ -166,7 +168,7 @@ class PDNS(Transform):
         base_url = config['OTX_transform.local.otx_url']
         api_key = config['OTX_transform.local.api_key']
         host = request.entity.value
-        url = '%s/indicators/hostname/%s/passive_dns' %\
+        url = '%s/indicators/hostname/%s/passive_dns' % \
               (base_url, host)
         r = requests.get(url, headers={'X-OTX-API-KEY': api_key})
         if r.status_code == 200:
@@ -174,7 +176,6 @@ class PDNS(Transform):
             res = r.json()
 
             for pdns in res['passive_dns']:
-
                 ip = IPv4Address(pdns['address'])
                 ip.link_label = 'last: %s' % pdns['last']
                 response += ip
@@ -183,7 +184,6 @@ class PDNS(Transform):
 
 
 class TagsHashes(Transform):
-
     input_type = Hash
     namespace = "Otx_Transform"
 
